@@ -8,13 +8,21 @@ This project is a web application that leverages large language models (LLMs) to
   Retrieves table DDLs from Redshift on demand and caches them for improved performance.
 
 - **LLM-Based Query Generation:**  
-  Uses either OpenAI’s API or a self-hosted LLM (e.g., Ollama) to generate SQL queries based on user-provided natural language.
+  Uses either OpenAI's API or a self-hosted LLM (e.g., Ollama) to generate SQL queries based on user-provided natural language.
+  - Supports streaming responses for real-time query generation
+  - Optimized for Redshift-specific SQL syntax
+  - Smart handling of date/time functions and comparisons
 
 - **Query Execution & CSV Export:**  
   Executes the generated SQL against Amazon Redshift, displays results in a scrollable table, and allows CSV downloads.
 
-- **Interactive UI:**  
-  A responsive frontend built with Tailwind CSS featuring a searchable table selector, prompt input area, results display, and a query history sidebar.
+- **Modern React Frontend:**  
+  A responsive frontend built with Next.js and Tailwind CSS featuring:
+  - Real-time table search and selection
+  - Interactive query input with immediate feedback
+  - Clean, modern UI with proper error handling
+  - Query history with one-click reuse
+  - Mobile-responsive design
 
 ## Setup & Installation
 
@@ -24,6 +32,8 @@ This project is a web application that leverages large language models (LLMs) to
    Navigate to the `backend` directory and install the required packages:
    ```bash
    cd backend
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    pip install -r requirements.txt
    ```
 
@@ -39,50 +49,90 @@ This project is a web application that leverages large language models (LLMs) to
 
    # LLM configuration
    OPENAI_API_KEY=your_openai_api_key
-   LLM_PROVIDER=openai       # or 'ollama' if using a self-hosted model
-   LLM_MODEL=gpt-3.5-turbo   # or your chosen model name
+   LLM_PROVIDER=ollama       # or 'openai' if using OpenAI
+   LLM_MODEL=qwen2.5-coder:1.5b   # or your chosen model name
+
+   # SSH tunneling settings (if needed)
+   USE_SSH_TUNNEL=false
+   SSH_HOST=your_bastion_host
+   SSH_PORT=22
+   SSH_USER=your_ssh_username
+   SSH_PRIVATE_KEY=/path/to/your/private/key
    ```
 
-3. **Run the Backend Server:**  
+3. **Start Ollama (if using local LLM):**
+   ```bash
+   # Install Ollama first if you haven't: https://ollama.ai/
+   ollama pull qwen2.5-coder:1.5b  # Pull the model
+   ollama serve  # Start the Ollama server
+   ```
+
+4. **Run the Backend Server:**  
    Start the FastAPI server using Uvicorn:
    ```bash
    uvicorn app:app --reload
    ```
    The API will be available at `http://localhost:8000`.
 
-4. Start a ollama server:
-   ```bash
-   ollama pull qwen2.5-coder:1.5b #(or your chosen model)
-   ollama run qwen2.5-coder:1.5b
-   ```
-
 ### Frontend
 
-1. **Open the Frontend:**  
-   Simply open the `frontend/index.html` file in your preferred web browser.  
-   The UI is configured to communicate with the backend API at `http://localhost:8000`.
+1. **Install Dependencies:**
+   ```bash
+   cd frontend/llm-sql-generator
+   npm install
+   ```
 
-2. **Usage:**
-   - **Table Selection:** Use the searchable dropdown to select a table.
-   - **Natural Language Input:** Enter your query request (e.g., "Show total sales per category for the last year").
-   - **Generate SQL:** Click the **Generate SQL** button to have the LLM produce the query.
-   - **Execute Query:** Click **Execute Query** to run the SQL against Redshift and view the results.
-   - **Export CSV:** Use the **Export CSV** button to download the results.
-   - **Query History:** Review and reload previous queries from the sidebar.
+2. **Run the Development Server:**
+   ```bash
+   npm run dev
+   ```
+   The frontend will be available at `http://localhost:3000`.
 
-## Future Enhancements
+## Current Capabilities
 
-- **Error Handling and Debugging:**  
-  Improve the iterative debugging loop with LLM suggestions for refining queries.
+- **Natural Language Understanding:**
+  - Generates SQL queries from plain English descriptions
+  - Handles complex table relationships and joins
+  - Supports aggregations, grouping, and filtering
 
-- **Multi-User Support:**  
-  Add user authentication and store per-user query history.
+- **Redshift Optimization:**
+  - Uses Redshift-specific date/time functions
+  - Defaults to created_at for time-based queries
+  - Proper handling of Redshift data types and syntax
 
-- **Advanced UI/UX:**  
-  Enhance the interface with additional filtering options, detailed result analytics, and more.
+- **Real-time Interaction:**
+  - Immediate feedback during query generation
+  - Live table search and filtering
+  - Interactive error handling and validation
 
-- **Cloud Deployment:**  
-  Transition to a cloud-hosted environment (e.g., Vercel, AWS) with improved credential management and scaling.
+## Roadmap
+
+- **Query Enhancement:**
+  - [ ] Add query optimization suggestions
+  - [ ] Support for more complex joins and subqueries
+  - [ ] Query performance metrics and execution plans
+
+- **User Experience:**
+  - [ ] Save and categorize favorite queries
+  - [ ] Custom query templates
+  - [ ] Query result visualizations
+  - [ ] Dark mode support
+
+- **Security & Deployment:**
+  - [ ] User authentication and role-based access
+  - [ ] Query execution limits and safeguards
+  - [ ] Docker containerization
+  - [ ] Cloud deployment templates
+
+- **Advanced Features:**
+  - [ ] Query explanation in natural language
+  - [ ] Schema relationship visualization
+  - [ ] Batch query execution
+  - [ ] Scheduled query runs
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
