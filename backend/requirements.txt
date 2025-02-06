@@ -4,4 +4,4 @@ psycopg2-binary
 openai
 requests
 python-dotenv
-
+sshtunnel
